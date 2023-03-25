@@ -1,6 +1,6 @@
 #include "Pass1.h"
 string errorMessage;
-vector<parsedLine> literals;
+vector<parsedLine> xxx;
 bool literalExistance;
 int handelBYTE(string x) {
 	string val = "";
@@ -229,21 +229,21 @@ int literalLength(string literal, cSect* current) {
 }
 void writeLiterals(cSect* current) {
 	literalExistance = false;
-	for (unsigned int i = 0; i < literals.size(); i++) {
+	for (unsigned int i = 0; i < xxx.size(); i++) {
 		parsedLine p;
 		p.lable = "*";
-		p.opcode = trim(literals[i].operand1);
+		p.opcode = trim(xxx[i].operand1);
 		p.operand1 = "";
 		p.operand2 = "";
 		p.err = "";
 		writeFomatted(p, current);
 		current->litTab.insert(
-				pair<string, int>(trim(literals[i].operand1), current->locCtr));
+				pair<string, int>(trim(xxx[i].operand1), current->locCtr));
 		    //  Increment by the literal length
-		  	incLocCtr(current, literalLength(literals[i].operand1, current));
+		  	incLocCtr(current, literalLength(xxx[i].operand1, current));
 
 	}
-	literals.clear();
+	xxx.clear();
 }
 
 void addExtRefs(parsedLine pl, cSect* current) {
@@ -272,16 +272,16 @@ void getlocCtrIncr(parsedLine pl, cSect* current, bool* started, bool* ended) {
 	int incr = validate(pl);
 	if (pl.operand1.length() > 0 && isLit(pl.operand1)) {
 		bool add = true;
-		for(unsigned int y = 0; y < literals.size() ; y++)
+		for(unsigned int y = 0; y < xxx.size() ; y++)
 		{
-			if(literals[y].operand1.compare(pl.operand1)==0){
+			if(xxx[y].operand1.compare(pl.operand1)==0){
 				add = false;
 				break;
 			}
 		}
 		if(add)
 		{
-			literals.push_back(pl);
+			xxx.push_back(pl);
 		}
 		literalExistance = true;
 	}
@@ -366,7 +366,7 @@ cSect runPass1(vector<parsedLine> v, bool* started, bool* ended,
 	parsedLine pl;
 	cSect current;
 	current.locCtr = 0;
-	literals.clear();
+	xxx.clear();
 	literalExistance = false;
 	for (unsigned int i = 0; i < v.size(); i++) {
 		pl = v[i];

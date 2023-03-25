@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
 			} else {
 			}
 		}
-		writeBorder(&opfile);
+		writeLine(&opfile," ");
 		writeSymTab(&opfile, &cSects[i].symTab);
 	}
 

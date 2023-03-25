@@ -4,7 +4,7 @@ string errorMessages;
 void runPass2(ofstream* opFile, vector<cSect>* cSects) {
 
 	errorMessages = "";
-	writeBorder_Pass2(opFile);
+	writeLine(opFile,"\n");
 	writeHeader_Pass2(opFile);
 	vector<vector<string> > objectCodes;
 	bool success = true;
@@ -35,7 +35,7 @@ void runPass2(ofstream* opFile, vector<cSect>* cSects) {
 			string operands = mergeStrings(v[j].p.operand1, v[j].p.operand2,
 					',');
 			string line = constructLine_Pass2(v[j].loc, v[j].p.lable,
-					v[j].p.opcode, operands, x.flags, objectCode);
+					v[j].p.opcode, operands, objectCode);
 
 			objectCodes[i].push_back(objectCode);
 			writeLine(opFile, line);

@@ -246,15 +246,13 @@ int main2() {
 	opCode op;
 	op.format = 4;
 	op.operation = 0x74;
-	op.flags = 0b010001;
 	op.displacement = 0x1000;
-	writeLine(&ofile, constructLine_Pass2(400, "B", "+LDT", "#MAXLENGTH", op.flags, calcOpCode(op)));
+	writeLine(&ofile, constructLine_Pass2(400, "B", "+LDT", "#MAXLENGTH", calcOpCode(op)));
 
 	writeError(&ofile, "this is an error");
 
 	op.format = 33;
-	op.flags = 0b000000;
-	writeLine(&ofile, constructLine_Pass2(400, "", "RESW", "1024", op.flags, calcOpCode(op)));
+	writeLine(&ofile, constructLine_Pass2(400, "", "RESW", "1024", calcOpCode(op)));
 
 	ofile.close();
 
@@ -320,7 +318,7 @@ string constructLine(int address, string label, string op, string operands) {
 }
 
 string constructLine_Pass2(int address, string label, string op_str,
-		string operands, bitset<6> flags, string opCode) {
+		string operands, string opCode) {
 	int length;
 	char spaceChar = SPACE_CHAR;
 	char zeroChar = ZERO_CHAR;
@@ -343,20 +341,10 @@ string constructLine_Pass2(int address, string label, string op_str,
 	adjustStringLength(&op_str, length, spaceChar, false);
 	length = OPERANDS_LENGTH;
 	adjustStringLength(&operands, length, spaceChar, false);
-	string flags_str = flags.to_string(), mod_flags_str = "";
-	if (flags_str.compare("000000") != 0) {
-		for (int i = 0; (unsigned) i < flags_str.size(); i++) {
-			mod_flags_str += flags_str[i];
-			if ((unsigned) i + 1 < flags_str.size())
-				mod_flags_str += " ";
-		}
-	}
-	length = FLAGS_LENGTH;
-	adjustStringLength(&mod_flags_str, length, spaceChar, false);
 	length = OPCODE_LENGTH;
 	adjustStringLength(&opCode, length, spaceChar, false);
 	line = lineNumberStr + addressStr + label + op_str + operands
-			+ mod_flags_str + opCode;
+			 + opCode;
 	return line;
 }
 
@@ -406,7 +394,6 @@ void writeHeader(ofstream* file) {
 	line += temp;
 	writeLine(file, line);
 	line = "";
-	adjustStringLength(&line, fileLineLength, equalChar, false);
 	writeLine(file, line);
 
 }
@@ -441,15 +428,11 @@ void writeHeader_Pass2(ofstream* file) {
 	temp = "operands";
 	adjustStringLength(&temp, operandsLength, spaceChar, false);
 	line += temp;
-	temp = "n i x b p e";
-	adjustStringLength(&temp, flagsLength, spaceChar, false);
-	line += temp;
 	temp = "opcode";
 	adjustStringLength(&temp, opCodeLength, spaceChar, false);
 	line += temp;
 	writeLine(file, line);
 	line = "";
-	adjustStringLength(&line, pass2Length, equalChar, false);
 	writeLine(file, line);
 
 }
@@ -506,28 +489,22 @@ void writeSymTab(ofstream* file, map<string, symInfo*>* theMap) {
 	char zeroChar = ZERO_CHAR;
 
 	string temp, headerLine = "";
-	writeLine(file, "\t Symbol\t\t Table\t\t (values in hex)\n");
+	writeLine(file, "Symbol Table\n");
 	temp = "";
 	adjustStringLength(&temp, 33, equalChar, false);
-	writeLine(file, temp);
-	temp = "|\tname";
+	temp = "name";
 	adjustStringLength(&temp, 11, spaceChar, false);
 	headerLine += temp;
-//	writeLine(file, temp);
 	temp = "address";
 	adjustStringLength(&temp, 10, spaceChar, false);
 	headerLine += temp;
-	temp = "Abs/Rel";
-	temp += "\t|";
+	temp = "Abs/Rel\n";
 	headerLine += temp;
 	writeLine(file, headerLine);
-	temp = "|\t";
 	adjustStringLength(&temp, 28, dashChar, false);
-	temp += "\t|";
-	writeLine(file, temp);
 	for (map<string, symInfo*>::const_iterator it = theMap->begin(); it
 			!= theMap->end(); it++) {
-		string symbol = "|\t" + it->first;
+		string symbol =  it->first;
 		symInfo* n = it->second;
 		string address = intToString(n->address, true);
 		string rel = "";
@@ -543,13 +520,12 @@ void writeSymTab(ofstream* file, map<string, symInfo*>* theMap) {
 		line += address;
 		adjustStringLength(&address, 10, spaceChar, true);
 		adjustStringLength(&rel, 7, spaceChar, true);
-		rel += "\t|";
 		line += rel;
 		writeLine(file, line);
 	}
 	temp = "";
-	adjustStringLength(&temp, 33, equalChar, false);
-	writeLine(file, temp);
+	// adjustStringLength(&temp, 33, equalChar, false);
+	writeLine(file,"\n");
 }
 
 void writeComment(ofstream* file, string comment) {
@@ -557,7 +533,7 @@ void writeComment(ofstream* file, string comment) {
 	int addressLength = ADDRESS_LENGTH;
 	char spaceChar = SPACE_CHAR;
 	adjustStringLength(&comment,
-			comment.size() + lineNumberLength + addressLength, spaceChar, true);
+			1, spaceChar, true);
 	writeLine(file, comment);
 }
 

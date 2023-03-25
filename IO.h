@@ -33,7 +33,7 @@ using namespace std;
 string constructLine(int lineNumber, string label, string op, string operands);
 
 string constructLine_Pass2(int address, string label, string op_str,
-		string operands, bitset<6> flags, string opCode);
+		string operands, string opCode);
 
 void deleteFile(string name);
 
