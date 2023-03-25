@@ -541,11 +541,7 @@ void writeHeaderRecord(ofstream* file, string prog_name, int starting_add, int p
 	char spaceChar = SPACE_CHAR;
 	char zeroChar = ZERO_CHAR;
 
-	string line = "\t Header Record :\t\t\n";
-	writeLine(file, line);
-	line = "H^";
-	adjustStringLength(&line, 11, spaceChar, true);
-	if (prog_name.compare("") == 0) adjustStringLength(&prog_name, 6, spaceChar, true);
+	string line = "H^";
 	line += prog_name;
 	line += "^";
 	string starting_add_str = intToString(starting_add, true);
@@ -556,19 +552,6 @@ void writeHeaderRecord(ofstream* file, string prog_name, int starting_add, int p
 	adjustStringLength(&prog_length_str, 6, zeroChar, true);
 	line += prog_length_str;
 	writeLine(file, line);
-	line = "";
-	adjustStringLength(&line, 11, spaceChar, true);
-	line += "Program Name: ";
-	if (prog_name.compare("") == 0) line += "Unknown.";
-	else line += prog_name;
-	writeLine(file, line);
-	line = "";
-	adjustStringLength(&line, 11, spaceChar, true);
-	line += "Loading Address: ";
-	line += starting_add_str;
-	line += "\n";
-	writeLine(file, line);
-
 }
 
 void writeTextRecords(ofstream* file, vector<string>* opCodes, vector<locatedParsedLine>* lpl) { // 4
@@ -578,10 +561,7 @@ void writeTextRecords(ofstream* file, vector<string>* opCodes, vector<locatedPar
 	int end_address = 0;
 	string start_address_str;
 	string length_str;
-
-	string line = "\tText Record(s) :\t\t\n";
 	string temp_line = "";
-	writeLine(file, line);
 
 	for (unsigned int i = 0; i< opCodes->size();){
 		if ((*opCodes)[i].compare("") == 0 || (*lpl)[i].p.lable.compare("*") == 0){
@@ -589,11 +569,9 @@ void writeTextRecords(ofstream* file, vector<string>* opCodes, vector<locatedPar
 				continue;
 		}
 
-		line ="T^";
-		adjustStringLength(&line, 11, spaceChar, true);
+		string line ="T^";
 		start_address = (*lpl)[i].loc;
 		start_address_str = intToString(start_address, true);
-		adjustStringLength(&start_address_str, 6, zeroChar, true);
 		line += start_address_str;
 		int x = 0;
 		string temp = "";
@@ -613,7 +591,6 @@ void writeTextRecords(ofstream* file, vector<string>* opCodes, vector<locatedPar
 			x++;
 		}
 		length_str = intToString(end_address - start_address, true);
-		adjustStringLength(&length_str, 2, zeroChar, true);
 		line += "^";
 		line += length_str;
 		line += temp;
@@ -626,22 +603,18 @@ void writeModRecords(ofstream* file, vector<modification>* mods) { // 5
 	char spaceChar = SPACE_CHAR;
 	int address = 0, hBytes = 0;
 	string address_str, hBytes_str;
-	string line = "\tModification Record(s) :\t\t\n";
-	writeLine(file, line);
 	for (int i = 0; (unsigned)i < mods->size(); i++) {
 		modification mod = (*mods)[i];
 		if (mod.exRef) {
 			// multiple mod records
 			for (int j = 0; (unsigned)j < mod.refs.size(); j++) {
-				line = "M^";
-				adjustStringLength(&line, 11, spaceChar, true);
+				string line = "M^";
 				address = mod.address;
 				address_str = intToString(address, true);
 				line += address_str;
 				line += "^";
 				hBytes = mod.hbytes;
 				hBytes_str = intToString(hBytes, false);
-				adjustStringLength(&hBytes_str, 2, zeroChar, true);
 				line += hBytes_str;
 				line += "^";
 				line += mod.signs[j];
@@ -650,15 +623,13 @@ void writeModRecords(ofstream* file, vector<modification>* mods) { // 5
 			}
 		}
 		else {
-			line = "M^";
-			adjustStringLength(&line, 11, spaceChar, true);
+			string line = "M^";
 			address = mod.address;
 			address_str = intToString(address, true);
 			line += address_str;
 			line += "^";
 			hBytes = mod.hbytes;
 			hBytes_str = intToString(hBytes, false);
-			adjustStringLength(&hBytes_str, 2, zeroChar, true);
 			line += hBytes_str;
 			writeLine(file, line);
 		}
@@ -673,25 +644,20 @@ void writeDefineRecord(ofstream* file, vector<string>* exdefs, map<string, symIn
 	int address = 0;
 	int i = 0;
 	string address_str;
-	string line = "\tDefine Record :\t\t\n";
-	writeLine(file, line);
 	for (; (unsigned)i < exdefs->size(); i++) {
-		line = "D^";
-		adjustStringLength(&line, 11, spaceChar, true);
+		string line = "D^";
 		do {
 			if ((unsigned)i >= exdefs->size()) break;
 			string s = (*exdefs)[i];
 			symInfo* sInfo = theMap->at(s);
 			address = sInfo->address;
 			address_str = intToString(address, true);
-			adjustStringLength(&address_str, 6, zeroChar, true);
 			line += (*exdefs)[i];
 			line += "^";
 			line += address_str;
 			if ((i+1) % 5 != 0 && (unsigned)(i+1) < exdefs->size()) line += "^";
 			i++;
 		} while (i % 5 != 0);
-		if ((unsigned)i >= exdefs->size())line += "\n";
 		i--;
 		writeLine(file, line);
 	}
@@ -702,18 +668,14 @@ void writeReferRecord(ofstream* file, vector<string>* exrefs) { // 3
 	char spaceChar = SPACE_CHAR;
 	int i = 0;
 
-	string line = "\tRefer Record :\t\t\n";
-	writeLine(file, line);
 	for (; (unsigned)i < exrefs->size(); i++) {
-		line = "R^";
-		adjustStringLength(&line, 11, spaceChar, true);
+		string line = "R^";
 		do {
 			if ((unsigned)i >= exrefs->size()) break;
 			line += (*exrefs)[i];
 			if ((i+1) % 5 != 0 && (unsigned)(i+1) < exrefs->size()) line += "^";
 			i++;
 		} while (i % 5 != 0);
-		if ((unsigned)i >= exrefs->size()) line += "\n";
 		i--;
 		writeLine(file, line);
 	}
